@@ -1,0 +1,146 @@
+@startuml Диаграмма классов
+!theme plain
+skinparam classAttributeIconSize 0
+
+package "Фронтенд" {
+    class App {
+        -files: File[]
+        -loading: boolean
+        -selectedFiles: string[]
+        -error: string
+        -awsConfigError: boolean
+        +loadFiles(): void
+        +handleFileUploaded(): void
+        +handleDelete(key: string): void
+        +handleDeleteSelected(): void
+        +toggleFileSelection(key: string): void
+        +selectAll(): void
+    }
+
+    class FileUpload {
+        -dragActive: boolean
+        -uploading: boolean
+        -uploadProgress: object
+        -error: string
+        +handleDrag(e: Event): void
+        +handleDrop(e: Event): void
+        +handleFileInput(e: Event): void
+        +processFiles(files: File[]): void
+    }
+
+    class FileList {
+        -downloading: object
+        -previewing: object
+        +handleDownload(key: string): void
+        +handlePreview(key: string): void
+        +formatFileSize(bytes: number): string
+        +formatDate(dateString: string): string
+        +getFileIcon(key: string): string
+    }
+
+    class ApiService {
+        +uploadFile(file: File): Promise
+        +uploadFiles(files: File[]): Promise
+        +getFiles(): Promise
+        +getFileDetails(key: string): Promise
+        +downloadFile(key: string): Promise
+        +getPreviewUrl(key: string): Promise
+        +deleteFile(key: string): Promise
+        +deleteFiles(keys: string[]): Promise
+    }
+
+    class AwsConfigWarning {
+        +render(): JSX
+    }
+}
+
+package "Бэкенд" {
+    class ExpressServer {
+        -port: number
+        -app: Express
+        +start(): void
+        +setupMiddleware(): void
+        +setupRoutes(): void
+    }
+
+    class LocalStorageRoutes {
+        +upload(): void
+        +uploadMultiple(): void
+        +listFiles(): void
+        +getFileDetails(): void
+        +downloadFile(): void
+        +previewFile(): void
+        +deleteFile(): void
+        +deleteFiles(): void
+    }
+
+    class S3Routes {
+        +upload(): void
+        +uploadMultiple(): void
+        +listFiles(): void
+        +getFileDetails(): void
+        +downloadFile(): void
+        +previewFile(): void
+        +deleteFile(): void
+        +deleteFiles(): void
+    }
+
+    class LocalStorageConfig {
+        -STORAGE_DIR: string
+        -FILES_DIR: string
+        -METADATA_DIR: string
+        +initStorage(): Promise<void>
+        +getFilePath(key: string): string
+        +saveMetadata(key: string, metadata: object): Promise<void>
+        +getMetadata(key: string): Promise<object>
+        +deleteFile(key: string): Promise<void>
+        +listFiles(): Promise<File[]>
+        +getFileInfo(key: string): Promise<object>
+    }
+
+    class S3Config {
+        -s3: AWS.S3
+        -BUCKET_NAME: string
+        +ensureBucketExists(): Promise<void>
+    }
+}
+
+package "Хранилище" {
+    class FileSystem {
+        +readFile(path: string): Promise<Buffer>
+        +writeFile(path: string, data: Buffer): Promise<void>
+        +unlink(path: string): Promise<void>
+        +readdir(path: string): Promise<string[]>
+        +stat(path: string): Promise<Stats>
+        +mkdir(path: string): Promise<void>
+    }
+
+    class Metadata {
+        -key: string
+        -originalName: string
+        -contentType: string
+        -size: number
+        -uploadedAt: string
+    }
+}
+
+App --> FileUpload : использует
+App --> FileList : использует
+App --> ApiService : использует
+App --> AwsConfigWarning : использует
+
+FileUpload --> ApiService : вызывает
+FileList --> ApiService : вызывает
+
+ApiService --> ExpressServer : HTTP запросы
+
+ExpressServer --> LocalStorageRoutes : маршруты
+ExpressServer --> S3Routes : маршруты
+
+LocalStorageRoutes --> LocalStorageConfig : использует
+S3Routes --> S3Config : использует
+
+LocalStorageConfig --> FileSystem : использует
+LocalStorageConfig --> Metadata : управляет
+
+@enduml

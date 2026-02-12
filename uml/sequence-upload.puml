@@ -1,0 +1,64 @@
+@startuml Последовательность - Загрузка файла
+!theme plain
+
+actor Пользователь
+participant "Фронтенд\n(React)" as Frontend
+participant "API Сервис\n(api.js)" as API
+participant "Express Сервер" as Server
+participant "Маршрут загрузки\n(localStorage.js)" as Route
+participant "Локальное хранилище" as Storage
+participant "Файловая система" as FS
+participant "Метаданные" as Meta
+
+Пользователь -> Frontend: Перетащить файл\nили выбрать
+activate Frontend
+
+Frontend -> Frontend: Создать FormData
+Frontend -> Frontend: Установить состояние загрузки
+Frontend -> API: POST /api/storage/upload\n(файл в FormData)
+activate API
+
+API -> Server: HTTP POST запрос
+activate Server
+
+Server -> Route: upload.single('file')
+activate Route
+
+Route -> Route: Проверить запрос
+Route -> Storage: Сохранить файл на диск
+activate Storage
+
+Storage -> FS: Записать в\nstorage/files/
+activate FS
+FS -> FS: Сохранить файл
+FS --> Storage: Файл сохранён
+deactivate FS
+
+Storage -> Storage: Создать метаданные
+Storage -> Meta: Сохранить JSON метаданных
+activate Meta
+Meta -> Meta: Записать файл метаданных
+Meta --> Storage: Метаданные сохранены
+deactivate Meta
+
+Storage --> Route: Файл успешно сохранён
+deactivate Storage
+
+Route -> Route: Создать объект ответа
+Route --> Server: JSON ответ\n{success, file}
+deactivate Route
+
+Server --> API: HTTP 200 ответ
+deactivate Server
+
+API --> Frontend: Данные ответа
+deactivate API
+
+Frontend -> Frontend: Обновить прогресс загрузки
+Frontend -> Frontend: Показать сообщение об успехе
+Frontend -> Frontend: Вызвать onUploadSuccess()
+Frontend -> Frontend: Обновить список файлов
+Frontend --> Пользователь: Показать успех
+deactivate Frontend
+
+@enduml

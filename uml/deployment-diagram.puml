@@ -1,0 +1,59 @@
+@startuml Диаграмма развертывания
+!theme plain
+
+node "Компьютер разработчика" {
+  artifact "React приложение" as ReactApp {
+    component [Порт 3000] as FrontendPort
+  }
+  
+  artifact "Express сервер" as ExpressApp {
+    component [Порт 5000] as BackendPort
+  }
+  
+  folder "Локальное хранилище" as LocalStorage {
+    file "storage/files/" as FilesDir
+    file "storage/metadata/" as MetaDir
+  }
+  
+  file ".env" as EnvFile
+}
+
+cloud "Облако AWS" {
+  node "Сервис AWS S3" {
+    component "S3 Bucket" as S3Bucket
+  }
+  
+  node "AWS IAM" {
+    component "Ключи доступа" as AccessKeys
+  }
+}
+
+database "Файловая система" {
+  component "Локальные файлы" as LocalFiles
+}
+
+FrontendPort --> BackendPort : HTTP запросы
+BackendPort --> LocalStorage : Операции с файлами
+BackendPort --> S3Bucket : Вызовы S3 API
+BackendPort --> EnvFile : Чтение конфигурации
+LocalStorage --> LocalFiles : I/O операции
+S3Bucket --> AccessKeys : Аутентификация
+
+note right of BackendPort
+  Режим хранилища:
+  - Локальное (по умолчанию)
+  - AWS S3 (опционально)
+end note
+
+note right of LocalStorage
+  Используется при:
+  USE_LOCAL_STORAGE=true
+end note
+
+note right of S3Bucket
+  Используется при:
+  USE_LOCAL_STORAGE=false
+  AWS credentials настроены
+end note
+
+@enduml

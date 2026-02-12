@@ -1,0 +1,32 @@
+@startuml IDF API
+!theme plain
+
+title IDF - Схема API Storage
+
+left to right direction
+
+rectangle "API Storage" {
+  usecase "POST /upload" as U1
+  usecase "POST /upload-multiple" as U2
+  usecase "GET /files" as U3
+  usecase "GET /files/:key" as U4
+  usecase "GET /download/:key" as U5
+  usecase "GET /preview/:key" as U6
+  usecase "GET /files/:key/view" as U7
+  usecase "DELETE /files/:key" as U8
+  usecase "DELETE /files" as U9
+}
+
+actor Клиент
+
+Клиент --> U1
+Клиент --> U2
+Клиент --> U3
+Клиент --> U4
+Клиент --> U5
+Клиент --> U6
+Клиент --> U7
+Клиент --> U8
+Клиент --> U9
+
+@enduml

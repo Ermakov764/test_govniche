@@ -1,0 +1,79 @@
+@startuml Последовательность - Скачивание файла
+!theme plain
+
+actor Пользователь
+participant "Фронтенд\n(React)" as Frontend
+participant "API Сервис\n(api.js)" as API
+participant "Express Сервер" as Server
+participant "Маршрут скачивания\n(localStorage.js)" as Route
+participant "Локальное хранилище" as Storage
+participant "Файловая система" as FS
+
+Пользователь -> Frontend: Нажать кнопку скачать
+activate Frontend
+
+Frontend -> Frontend: Установить downloading[ключ] = true
+Frontend -> API: GET /api/storage/download/:key\n(responseType: 'blob')
+activate API
+
+API -> Server: HTTP GET запрос
+activate Server
+
+Server -> Route: Обработчик GET /download/:key
+activate Route
+
+Route -> Route: Декодировать параметр key
+Route -> Storage: getFileInfo(ключ)
+activate Storage
+
+Storage -> FS: stat(путь к файлу)
+activate FS
+FS --> Storage: Статистика файла
+deactivate FS
+
+Storage -> Storage: getMetadata(ключ)
+Storage --> Route: Объект информации о файле
+deactivate Storage
+
+alt Файл существует
+    Route -> Route: Установить заголовки ответа\n(Content-Type, Content-Disposition)
+    Route -> FS: createReadStream(путь)
+    activate FS
+    Route -> Route: pipe(поток, ответ)
+    FS --> Route: Части потока файла
+    Route --> Server: Ответ потоком
+    deactivate FS
+    
+    Server --> API: HTTP 200 ответ\n(Blob данные)
+    deactivate Route
+    deactivate Server
+    
+    API --> Frontend: Blob ответ
+    deactivate API
+    
+    Frontend -> Frontend: Создать Blob URL
+    Frontend -> Frontend: Создать элемент <a>
+    Frontend -> Frontend: Установить атрибут download
+    Frontend -> Frontend: Вызвать click
+    Frontend -> Frontend: Удалить элемент
+    Frontend -> Frontend: Отозвать URL
+    Frontend -> Frontend: Установить downloading[ключ] = false
+    Frontend --> Пользователь: Файл скачан
+else Файл не найден
+    Route --> Server: HTTP 404 ошибка
+    deactivate Route
+    deactivate Server
+    
+    Server --> API: HTTP 404 ответ
+    deactivate Server
+    
+    API --> Frontend: Ответ об ошибке
+    deactivate API
+    
+    Frontend -> Frontend: Показать сообщение об ошибке
+    Frontend --> Пользователь: Отобразить ошибку
+end
+
+deactivate Frontend
+
+@enduml

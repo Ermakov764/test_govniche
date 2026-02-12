@@ -1,0 +1,160 @@
+.aws-config-warning {
+  background: linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%);
+  border: 2px solid #ffc107;
+  border-radius: 12px;
+  padding: 30px;
+  margin: 20px 40px;
+  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.2);
+}
+
+.warning-icon {
+  font-size: 3rem;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.warning-content h3 {
+  color: #856404;
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.warning-content > p {
+  color: #856404;
+  font-size: 1.1rem;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.instructions {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.instructions h4 {
+  color: #333;
+  margin-bottom: 20px;
+  font-size: 1.3rem;
+  border-bottom: 2px solid #667eea;
+  padding-bottom: 10px;
+}
+
+.step {
+  background: #f8f9fa;
+  border-left: 4px solid #667eea;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+}
+
+.step h5 {
+  color: #333;
+  margin-bottom: 10px;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.step p {
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+
+.step a {
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.step a:hover {
+  text-decoration: underline;
+}
+
+.instructions ol {
+  margin-left: 20px;
+  margin-bottom: 15px;
+  margin-top: 10px;
+}
+
+.instructions li {
+  margin-bottom: 8px;
+  color: #555;
+  line-height: 1.6;
+}
+
+.instructions ul {
+  margin-left: 30px;
+  margin-top: 8px;
+  margin-bottom: 15px;
+}
+
+.hint {
+  background: #e7f3ff;
+  padding: 10px;
+  border-radius: 4px;
+  margin-top: 10px;
+  font-size: 0.9rem;
+  line-height: 1.8;
+}
+
+.instructions code {
+  background: #f4f4f4;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  color: #d63384;
+  font-size: 0.9em;
+}
+
+.example-config {
+  background: #f8f9fa;
+  border-left: 4px solid #667eea;
+  padding: 15px;
+  margin: 15px 0;
+  border-radius: 4px;
+}
+
+.example-config strong {
+  display: block;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.example-config pre {
+  margin: 0;
+  color: #333;
+  font-size: 0.9rem;
+  overflow-x: auto;
+}
+
+.note {
+  background: #e7f3ff;
+  border-left: 4px solid #2196F3;
+  padding: 12px;
+  margin-top: 15px;
+  border-radius: 4px;
+  color: #0c5460;
+  font-size: 0.95rem;
+}
+
+.note strong {
+  color: #0c5460;
+}
+
+@media (max-width: 768px) {
+  .aws-config-warning {
+    margin: 20px;
+    padding: 20px;
+  }
+
+  .instructions {
+    padding: 15px;
+  }
+
+  .example-config pre {
+    font-size: 0.8rem;
+  }
+}

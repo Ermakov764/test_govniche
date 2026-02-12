@@ -1,0 +1,68 @@
+@startuml Последовательность - Получение списка файлов
+!theme plain
+
+actor Пользователь
+participant "Фронтенд\n(React)" as Frontend
+participant "API Сервис\n(api.js)" as API
+participant "Express Сервер" as Server
+participant "Маршрут списка\n(localStorage.js)" as Route
+participant "Локальное хранилище" as Storage
+participant "Файловая система" as FS
+participant "Метаданные" as Meta
+
+Пользователь -> Frontend: Открыть приложение\nили обновить
+activate Frontend
+
+Frontend -> Frontend: Установить состояние загрузки
+Frontend -> API: GET /api/storage/files
+activate API
+
+API -> Server: HTTP GET запрос
+activate Server
+
+Server -> Route: Обработчик GET /files
+activate Route
+
+Route -> Storage: listFiles()
+activate Storage
+
+Storage -> FS: readdir(storage/files/)
+activate FS
+FS --> Storage: Массив имён файлов
+deactivate FS
+
+loop Для каждого файла
+    Storage -> FS: stat(путь к файлу)
+    activate FS
+    FS --> Storage: Статистика файла\n(размер, дата)
+    deactivate FS
+    
+    Storage -> Meta: getMetadata(ключ)
+    activate Meta
+    Meta -> Meta: Прочитать JSON файл
+    Meta --> Storage: Объект метаданных\nили null
+    deactivate Meta
+    
+    Storage -> Storage: Объединить статистику\nи метаданные
+end
+
+Storage -> Storage: Сортировать по дате изменения
+Storage --> Route: Массив объектов файлов
+deactivate Storage
+
+Route -> Route: Создать ответ\n{success, count, files}
+Route --> Server: JSON ответ
+deactivate Route
+
+Server --> API: HTTP 200 ответ
+deactivate Server
+
+API --> Frontend: Данные ответа
+deactivate API
+
+Frontend -> Frontend: Обновить состояние files
+Frontend -> Frontend: Установить loading = false
+Frontend --> Пользователь: Отобразить список файлов
+deactivate Frontend
+
+@enduml

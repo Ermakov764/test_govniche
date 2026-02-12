@@ -1,0 +1,73 @@
+@startuml Диаграмма компонентов
+!theme plain
+
+package "Клиентское приложение" {
+    [React Фронтенд] as Frontend
+    [Компонент FileUpload] as UploadComp
+    [Компонент FileList] as ListComp
+    [API Сервис] as ApiService
+    [AwsConfigWarning] as WarningComp
+}
+
+package "Серверное приложение" {
+    [Express Сервер] as Server
+    [CORS Middleware] as CORS
+    [JSON Parser] as JSONParser
+    [Обработчик ошибок] as ErrorHandler
+}
+
+package "Слой API" {
+    [Маршруты локального хранилища] as LocalRoutes
+    [S3 Маршруты] as S3Routes
+    [Обработчики маршрутов] as Handlers
+}
+
+package "Слой хранилища" {
+    [Конфиг локального хранилища] as LocalConfig
+    [S3 Конфиг] as S3Config
+    [Файловая система] as FS
+    [Менеджер метаданных] as Metadata
+}
+
+package "Конфигурация" {
+    [Конфиг окружения] as EnvConfig
+    [Выбор режима хранилища] as ModeSelector
+}
+
+Frontend --> UploadComp
+Frontend --> ListComp
+Frontend --> WarningComp
+UploadComp --> ApiService
+ListComp --> ApiService
+
+Server --> CORS
+Server --> JSONParser
+Server --> ErrorHandler
+Server --> LocalRoutes
+Server --> S3Routes
+
+LocalRoutes --> Handlers
+S3Routes --> Handlers
+Handlers --> LocalConfig
+Handlers --> S3Config
+
+LocalConfig --> FS
+LocalConfig --> Metadata
+S3Config --> FS
+
+EnvConfig --> ModeSelector
+ModeSelector --> LocalConfig
+ModeSelector --> S3Config
+
+ApiService ..> Server : HTTP
+FS ..> [Файловая система] : I/O
+Metadata ..> [JSON файлы] : I/O
+
+note right of ModeSelector
+  USE_LOCAL_STORAGE=true
+  → Локальное хранилище
+  USE_LOCAL_STORAGE=false
+  → AWS S3
+end note
+
+@enduml
